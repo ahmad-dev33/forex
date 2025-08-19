@@ -1,0 +1,125 @@
+# ui.kv
+#:import Gradient kivy_gradient.Gradient
+
+<LoginScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        spacing: 20
+        
+        Label:
+            text: 'نظام تحليل الفوركس والكريبتو'
+            font_size: 24
+            size_hint_y: None
+            height: 50
+            
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            
+            Label:
+                text: 'مرحباً بك في نظام التحليل المتقدم'
+                font_size: 18
+                
+            Button:
+                text: 'تسجيل الدخول'
+                size_hint_y: None
+                height: 50
+                on_press: root.on_login()
+                
+            Label:
+                text: root.status_message
+                color: 0, 1, 0, 1 if "نجاح" in root.status_message else 1, 0, 0, 1
+                
+            Widget:
+                size_hint_y: None
+                height: 50
+                canvas:
+                    Color:
+                        rgba: 0, 0, 1, 0.3 if root.is_loading else 0, 0, 0, 0
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            padding: 10
+            
+            Spinner:
+                id: symbol_spinner
+                text: root.current_symbol
+                values: root.symbols
+                size_hint_x: 0.6
+                on_text: root.current_symbol = self.text
+                
+            Button:
+                text: 'تحليل'
+                size_hint_x: 0.4
+                on_press: root.on_analyze()
+        
+        ScrollView:
+            Label:
+                id: analysis_label
+                text: root.analysis_data
+                text_size: self.width, None
+                size_hint_y: None
+                height: self.texture_size[1]
+                padding: 10, 10
+        
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            padding: 10
+            spacing: 10
+            
+            Button:
+                text: 'شراء'
+                on_press: root.on_trade('buy')
+                
+            Button:
+                text: 'بيع'
+                on_press: root.on_trade('sell')
+                
+            Label:
+                text: f'الرصيد: {root.balance:.2f}'
+                
+        Button:
+            text: 'تجديد الاشتراك'
+            size_hint_y: None
+            height: 50
+            on_press: app.root.current = 'payment'
+
+<PaymentScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        spacing: 20
+        
+        Label:
+            text: 'نظام الدفع'
+            font_size: 24
+            
+        Label:
+            text: f'قيمة الاشتراك: {root.payment_amount} USDT'
+            font_size: 18
+            
+        Button:
+            text: 'الدفع بالكريبتو (USDT)'
+            on_press: root.process_payment('crypto')
+            
+        Button:
+            text: 'الدفع البنكي'
+            on_press: root.process_payment('bank')
+            
+        Label:
+            text: root.payment_status
+            color: 0, 1, 0, 1 if "نجاح" in root.payment_status else 1, 0, 0, 1
+            
+        Button:
+            text: 'العودة للرئيسية'
+            on_press: app.root.current = 'main'
